@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Profile</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <h1>AI Profile</h1>
+      <p>Ask me anything about my experience, skills, or projects.</p>
+    </header>
+
+    <div class="chat-panel">
+      <div id="messages" class="messages">
+        <div id="empty-state" class="empty-state">
+          Try: "Tell me about your experience with microservices" or
+          "What technologies do you work with?"
+        </div>
+      </div>
+      <form id="composer" class="composer">
+        <input
+          id="question-input"
+          type="text"
+          placeholder="Ask about my experience..."
+          autocomplete="off"
+          maxlength="2000"
+        />
+        <button id="send-button" type="submit">&#8594;</button>
+      </form>
+    </div>
+
+    <footer>Powered by LangGraph</footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
