@@ -1,10 +1,9 @@
 """LLM provider abstraction. Swap providers via LLM_PROVIDER without touching callers."""
 
-from functools import lru_cache
-
+import streamlit as st
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from app import config
+from src.config import settings
 
 DEFAULT_MODELS = {
     "anthropic": "claude-sonnet-5",
@@ -12,20 +11,20 @@ DEFAULT_MODELS = {
 }
 
 
-@lru_cache(maxsize=1)
+@st.cache_resource(show_spinner=False)
 def get_llm() -> BaseChatModel:
     """Return a configured chat model for the provider set in the environment."""
-    provider = config.LLM_PROVIDER.lower()
-    model = config.LLM_MODEL or DEFAULT_MODELS.get(provider, "")
+    provider = settings.LLM_PROVIDER.lower()
+    model = settings.LLM_MODEL or DEFAULT_MODELS.get(provider, "")
 
     if provider == "anthropic":
         from langchain_anthropic import ChatAnthropic
 
-        if not config.ANTHROPIC_API_KEY:
+        if not settings.ANTHROPIC_API_KEY:
             raise RuntimeError("ANTHROPIC_API_KEY is not set")
         return ChatAnthropic(
             model=model,
-            api_key=config.ANTHROPIC_API_KEY,
+            api_key=settings.ANTHROPIC_API_KEY,
             max_tokens=1024,
             temperature=0.3,
         )
@@ -33,11 +32,11 @@ def get_llm() -> BaseChatModel:
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
 
-        if not config.GOOGLE_API_KEY:
+        if not settings.GOOGLE_API_KEY:
             raise RuntimeError("GOOGLE_API_KEY is not set")
         return ChatGoogleGenerativeAI(
             model=model,
-            google_api_key=config.GOOGLE_API_KEY,
+            google_api_key=settings.GOOGLE_API_KEY,
             max_output_tokens=1024,
             temperature=0.3,
         )

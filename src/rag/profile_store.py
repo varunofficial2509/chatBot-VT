@@ -3,11 +3,11 @@
 import json
 from pathlib import Path
 
-from app import config
+from src.config import settings
 
 
 def load_profile() -> dict:
-    path = Path(config.PROFILE_PATH)
+    path = Path(settings.PROFILE_PATH)
     if not path.exists():
         return {}
     try:

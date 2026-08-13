@@ -1,11 +1,10 @@
 """Embedding function used for both ingestion and retrieval."""
 
-from functools import lru_cache
-
 import chromadb.utils.embedding_functions as embedding_functions
+import streamlit as st
 from chromadb.api.types import Documents, Embeddings
 
-from app import config
+from src.config import settings
 
 
 class _GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
@@ -20,16 +19,16 @@ class _GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
         return self._embeddings.embed_documents(list(input))
 
 
-@lru_cache(maxsize=1)
+@st.cache_resource(show_spinner=False)
 def get_embedding_function() -> embedding_functions.EmbeddingFunction:
     """Return the configured embedding function (local Sentence Transformers or Gemini)."""
-    if config.EMBEDDING_PROVIDER == "gemini":
-        if not config.GOOGLE_API_KEY:
+    if settings.EMBEDDING_PROVIDER == "gemini":
+        if not settings.GOOGLE_API_KEY:
             raise RuntimeError("GOOGLE_API_KEY is not set")
         return _GeminiEmbeddingFunction(
-            model=config.EMBEDDING_MODEL, api_key=config.GOOGLE_API_KEY
+            model=settings.EMBEDDING_MODEL, api_key=settings.GOOGLE_API_KEY
         )
 
     return embedding_functions.SentenceTransformerEmbeddingFunction(
-        model_name=config.EMBEDDING_MODEL
+        model_name=settings.EMBEDDING_MODEL
     )

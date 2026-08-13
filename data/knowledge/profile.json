@@ -1,0 +1,381 @@
+{
+  "name": "Varun Teja Jaladhula",
+  "headline": "Software Engineer with ~4 years of experience specializing in Java, Spring Boot, Microservices, Angular and Generative AI/RAG applications",
+  "skills": [
+    "Java 17",
+    "Spring Boot",
+    "Microservices",
+    "REST APIs",
+    "JPA",
+    "Hibernate",
+    "PostgreSQL",
+    "MySQL",
+    "Redis",
+    "Apache Kafka",
+    "Event-Driven Architecture",
+    "Transactional Outbox Pattern",
+    "Saga Pattern",
+    "Circuit Breaker",
+    "Retry",
+    "Distributed Tracing",
+    "Angular",
+    "Angular 16",
+    "TypeScript",
+    "RxJS",
+    "Python",
+    "SQL",
+    "Docker",
+    "Kubernetes",
+    "JUnit",
+    "SonarQube",
+    "Generative AI",
+    "RAG",
+    "LangChain",
+    "LangChain4j",
+    "LangGraph",
+    "Spring AI",
+    "OpenAI API",
+    "Google Gemini API",
+    "pgvector",
+    "FAISS",
+    "Chroma",
+    "Vector Databases",
+    "Cross-Encoder Reranking"
+  ],
+  "experience": [
+    {
+      "company": "Sopra Steria",
+      "product": "AeroWebb",
+      "domain": "Aviation MRO",
+      "role": "Senior Software Engineer",
+      "period": "Aug 2025 - Present",
+      "description": "Developing and maintaining Java/Spring Boot microservices and Angular applications for aviation maintenance workflows. Worked on distributed systems, Kafka-based event-driven services, database optimization, caching, performance improvements and frontend modernization."
+    },
+    {
+      "company": "Sopra Steria",
+      "product": "AeroWebb",
+      "domain": "Aviation MRO",
+      "role": "Software Engineer",
+      "period": "Feb 2023 - Aug 2025",
+      "description": "Built and maintained backend microservices and frontend modules for aircraft maintenance planning workflows."
+    }
+  ],
+  "technical_experience": {
+    "java": {
+      "level": "Strong",
+      "topics": [
+        "Java 17",
+        "OOP",
+        "Collections",
+        "Streams",
+        "Generics",
+        "Exception Handling",
+        "Multithreading",
+        "Concurrency",
+        "CompletableFuture",
+        "Functional Interfaces"
+      ]
+    },
+    "spring_boot": {
+      "level": "Strong",
+      "topics": [
+        "Spring Boot",
+        "REST APIs",
+        "Dependency Injection",
+        "JPA",
+        "Hibernate",
+        "Transactions",
+        "Validation",
+        "Exception Handling",
+        "Interceptors",
+        "Caching",
+        "Microservices"
+      ]
+    },
+    "microservices": {
+      "level": "Strong",
+      "topics": [
+        "Microservice Architecture",
+        "REST Communication",
+        "Event-Driven Architecture",
+        "Circuit Breaker",
+        "Retry",
+        "Distributed Tracing",
+        "Transactional Outbox",
+        "Saga Pattern",
+        "Distributed Transactions"
+      ]
+    },
+    "kafka": {
+      "level": "Hands-on",
+      "description": "Worked with Kafka-based event-driven services for flight scheduling and asynchronous inter-service communication.",
+      "metrics": [
+        "Relevant workloads processed 50K+ messages/day",
+        "Reduced inter-service latency by approximately 40%"
+      ],
+      "topics": [
+        "Topics",
+        "Partitions",
+        "Consumer Groups",
+        "Offsets",
+        "Producer/Consumer",
+        "Asynchronous Communication",
+        "Event-Driven Architecture"
+      ]
+    },
+    "database": {
+      "technologies": [
+        "PostgreSQL",
+        "MySQL",
+        "JPA",
+        "Hibernate",
+        "Redis"
+      ],
+      "experience": [
+        "JPA query optimization",
+        "CriteriaBuilder",
+        "JPA Metamodel",
+        "Database transactions",
+        "Query performance optimization",
+        "Redis caching"
+      ]
+    },
+    "angular": {
+      "level": "Hands-on",
+      "topics": [
+        "Angular 16",
+        "TypeScript",
+        "RxJS",
+        "Standalone Components",
+        "Lazy Loading",
+        "Modular Architecture",
+        "HTTP Interceptors",
+        "JWT",
+        "NgRx"
+      ]
+    },
+    "genai": {
+      "level": "Hands-on project experience",
+      "positioning": "Software engineer with hands-on experience building RAG and LLM applications rather than an ML researcher.",
+      "technologies": [
+        "RAG",
+        "LangChain",
+        "LangChain4j",
+        "LangGraph",
+        "Spring AI",
+        "OpenAI API",
+        "Google Gemini API",
+        "pgvector",
+        "FAISS",
+        "Chroma",
+        "HuggingFace Embeddings",
+        "Cross-Encoder Reranking",
+        "Context Compression"
+      ],
+      "experience": [
+        "Built an aviation maintenance RAG chatbot using LangChain, pgvector and OpenAI API.",
+        "Worked with document ingestion and chunking.",
+        "Worked with vector similarity search.",
+        "Experimented with cross-encoder reranking.",
+        "Worked with context compression.",
+        "Worked with Map-Reduce and Refine approaches.",
+        "Studied RAG evaluation using RAGAS, BERTScore and BLEU."
+      ]
+    }
+  },
+  "projects": [
+    {
+      "name": "Aviation Maintenance RAG Chatbot",
+      "category": "Generative AI / RAG",
+      "technologies": [
+        "LangChain",
+        "pgvector",
+        "OpenAI API"
+      ],
+      "description": "RAG chatbot for answering questions over aviation maintenance documentation."
+    },
+    {
+      "name": "ETag HTTP Caching",
+      "category": "Performance Optimization",
+      "technologies": [
+        "Angular",
+        "Spring Boot",
+        "PostgreSQL",
+        "HTTP ETag"
+      ],
+      "description": "Implemented HTTP caching using ETags to reduce unnecessary payload transfer and improve API performance.",
+      "architecture": [
+        "Angular sends If-None-Match",
+        "Spring interceptor checks ETag",
+        "ETag metadata stored in database",
+        "Database triggers update ETag metadata",
+        "304 Not Modified returned when appropriate",
+        "Admin users can bypass cache"
+      ],
+      "result": "Representative API testing showed approximately 21.57% average improvement."
+    },
+    {
+      "name": "PDF Generation Modernization",
+      "category": "Backend Modernization",
+      "technologies": [
+        "Java",
+        "Apache PDFBox"
+      ],
+      "description": "Migrated PDF generation from iText to Apache PDFBox across approximately 15 PDF generator classes."
+    }
+  ],
+  "performance_achievements": [
+    {
+      "area": "CompletableFuture optimization",
+      "result": "Reduced a relevant workflow from approximately 12 seconds to 4 seconds (~66% improvement)."
+    },
+    {
+      "area": "JPA/database optimization",
+      "result": "Approximately 30% improvement in relevant backend response times."
+    },
+    {
+      "area": "Redis caching",
+      "result": "Approximately 25% latency reduction in relevant workload."
+    },
+    {
+      "area": "ETag HTTP caching",
+      "result": "Approximately 21.57% average improvement across representative API tests."
+    },
+    {
+      "area": "Kafka event-driven processing",
+      "result": "Relevant workload processed 50K+ messages/day."
+    }
+  ],
+  "rag_experience": {
+    "chunking_strategies": [
+      "Fixed-size chunking",
+      "Recursive Character Splitting",
+      "Semantic Chunking"
+    ],
+    "large_document_experiment": {
+      "document": "Harry Potter PDF",
+      "pages": "3600+",
+      "chunk_size": "700-800",
+      "chunk_overlap": 150,
+      "chunks_generated": 12369
+    },
+    "embeddings": [
+      "all-MiniLM-L6-v2",
+      "models/gemini-embedding-001"
+    ],
+    "vector_stores": [
+      "pgvector",
+      "FAISS",
+      "Chroma"
+    ],
+    "evaluation": [
+      "RAGAS",
+      "BERTScore",
+      "BLEU"
+    ]
+  },
+  "system_design": {
+    "topics": [
+      "Microservices",
+      "Event-Driven Architecture",
+      "Kafka",
+      "Transactional Outbox",
+      "Saga Pattern",
+      "Distributed Transactions",
+      "Circuit Breaker",
+      "Retry",
+      "Distributed Tracing",
+      "Redis Caching",
+      "Load Balancing",
+      "Consistent Hashing",
+      "Virtual Nodes",
+      "Database Scaling",
+      "API Gateway",
+      "Service Discovery",
+      "Idempotency",
+      "High-Level Design",
+      "Low-Level Design"
+    ]
+  },
+  "dsa": {
+    "practice": "450+ LeetCode problems",
+    "topics": [
+      "Arrays",
+      "Strings",
+      "Hashing",
+      "Sliding Window",
+      "Stacks",
+      "Queues",
+      "Trees",
+      "Graphs",
+      "BFS",
+      "DFS",
+      "Dijkstra",
+      "Topological Sort",
+      "Dynamic Programming"
+    ]
+  },
+  "tools": [
+    "Git",
+    "Docker",
+    "Kubernetes",
+    "Jira",
+    "JUnit",
+    "SonarQube",
+    "Postman",
+    "CI/CD"
+  ],
+  "technology_gaps": {
+    "AWS": "Conceptual familiarity; limited hands-on production experience.",
+    "Terraform": "Conceptual familiarity; limited hands-on experience.",
+    "Datadog": "Conceptual familiarity; limited hands-on experience."
+  },
+  "knowledge_classification": {
+    "production_or_professional": [
+      "Java",
+      "Spring Boot",
+      "Microservices",
+      "REST APIs",
+      "JPA",
+      "Hibernate",
+      "PostgreSQL",
+      "MySQL",
+      "Kafka",
+      "Angular",
+      "TypeScript",
+      "Redis",
+      "Docker",
+      "JUnit",
+      "SonarQube"
+    ],
+    "hands_on_project": [
+      "RAG",
+      "LangChain",
+      "LangChain4j",
+      "LangGraph",
+      "Spring AI",
+      "OpenAI API",
+      "Google Gemini API",
+      "pgvector",
+      "FAISS",
+      "Chroma"
+    ],
+    "conceptual_or_limited": [
+      "AWS",
+      "Terraform",
+      "Datadog"
+    ]
+  },
+  "chatbot_instructions": {
+    "rules": [
+      "Answer technical questions using first person when describing Varun's experience.",
+      "Use only information contained in this profile and uploaded resume.",
+      "Never invent technologies, projects, responsibilities or metrics.",
+      "Clearly distinguish production experience from project experience and conceptual knowledge.",
+      "Prioritize AeroWebb experience for Java, Spring Boot, microservices, Kafka, databases and Angular questions.",
+      "For GenAI questions, explain the RAG architecture and relevant hands-on project experience.",
+      "Do not claim AWS, Terraform or Datadog production experience.",
+      "When information is unavailable, say that it is not specified rather than guessing."
+    ]
+  }
+}

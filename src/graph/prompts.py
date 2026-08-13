@@ -32,16 +32,16 @@ NOT_ENOUGH_INFO_MESSAGE = (
 
 
 def build_user_message(question: str, profile: dict, retrieved_context: list[str]) -> str:
-    """Combine structured profile data and retrieved resume chunks into one grounded prompt."""
+    """Combine structured profile data and retrieved knowledge chunks into one grounded prompt."""
     profile_json = json.dumps(profile, indent=2) if profile else "{}"
     context_block = (
         "\n\n---\n\n".join(retrieved_context)
         if retrieved_context
-        else "(no relevant resume excerpts found)"
+        else "(no relevant knowledge excerpts found)"
     )
 
     return (
         f"Candidate profile (structured JSON):\n{profile_json}\n\n"
-        f"Relevant resume excerpts:\n{context_block}\n\n"
+        f"Relevant knowledge excerpts:\n{context_block}\n\n"
         f"Recruiter question:\n{question}"
     )

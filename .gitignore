@@ -1,10 +1,11 @@
 .env
+.streamlit/secrets.toml
 __pycache__/
 *.pyc
 .venv/
 venv/
-data/chroma/
-data/profile.json
+data/vectorstore/*
+!data/vectorstore/.gitkeep
 *.egg-info/
 .pytest_cache/
 .DS_Store
