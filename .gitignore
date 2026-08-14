@@ -9,3 +9,5 @@ data/vectorstore/*
 *.egg-info/
 .pytest_cache/
 .DS_Store
+PROJECT_DECISIONS.md
+STREAMLIT_DEPLOYMENT.md
