@@ -11,8 +11,8 @@ import chromadb
 import streamlit as st
 from chromadb.api.models.Collection import Collection
 
-from src.config import settings
-from src.rag.embeddings import get_embedding_function
+from app import config as settings
+from app.rag.embeddings import get_embedding_function
 
 
 @st.cache_resource(show_spinner=False)

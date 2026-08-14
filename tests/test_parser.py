@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from src.ingestion.parser import IngestionError, normalize_text, parse_profile_json, validate_profile
+from app.rag.ingestion import IngestionError, normalize_text, parse_profile_json, validate_profile
 
 
 def test_validate_profile_accepts_required_fields():

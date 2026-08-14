@@ -24,7 +24,7 @@ def _get(key: str, default: str = "") -> str:
         return default
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # LLM provider
 LLM_PROVIDER = _get("LLM_PROVIDER", "anthropic")

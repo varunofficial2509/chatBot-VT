@@ -1,0 +1,16 @@
+[
+  {
+    "company": "Sopra Steria",
+    "role": "Senior Software Engineer",
+    "product": "AeroWebb",
+    "period": "Aug 2025 - Present",
+    "description": "Developing and maintaining Java/Spring Boot microservices and Angular applications for aviation maintenance workflows. Worked on distributed systems, Kafka-based event-driven services, database optimization, caching, performance improvements and frontend modernization."
+  },
+  {
+    "company": "Sopra Steria",
+    "role": "Software Engineer",
+    "product": "AeroWebb",
+    "period": "Feb 2023 - Aug 2025",
+    "description": "Built and maintained backend microservices and frontend modules for aircraft maintenance planning workflows."
+  }
+]

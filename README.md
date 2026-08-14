@@ -1,91 +1,113 @@
-# Personal Recruiter AI Chatbot
+# Varun Teja — Portfolio + AI Resume Assistant
 
-A minimal RAG chatbot that lets a recruiter ask questions about a candidate's
-resume and experience. Answers are grounded only in uploaded knowledge (a
-resume, a Markdown profile, a structured JSON profile) — nothing is invented.
+A minimal, dark personal developer portfolio with an integrated AI chatbot.
+Recruiters can browse the site normally, or ask the AI assistant questions
+about my experience — answered only from my actual resume and profile,
+grounded by RAG, never invented.
 
-> Give a recruiter the URL. They ask questions. The bot answers using your
-> resume and profile, or says it doesn't know.
+## Overview
 
-## What this is (and isn't)
+Two experiences, one app:
 
-- A small, single-process Streamlit app with a LangGraph RAG pipeline.
-- Not a generic chatbot platform, not multi-tenant, not enterprise-grade.
-- See [PROJECT_DECISIONS.md](PROJECT_DECISIONS.md) for the reasoning behind
-  every major choice and the tradeoffs this project intentionally accepts.
+- **Portfolio** — Home and Projects pages, driven by plain JSON content files.
+- **AI Assistant** — a LangGraph RAG chatbot answering from a Chroma vector
+  store built from my resume/profile.
+
+## Features
+
+- Native Streamlit multipage navigation (`st.navigation`, top bar): Home,
+  Projects, AI Assistant.
+- Minimal dark theme — exactly three colors (background, text, accent),
+  no default Streamlit blue/purple, no gradients, no icon soup.
+- Chat UI with `st.chat_message` / `st.chat_input`, markdown + code block
+  support, empty-state suggestion chips.
+- Owner-only knowledge management (hidden page, password-gated) — upload a
+  resume PDF, a Markdown profile, or a JSON profile, then rebuild the index.
+- Knowledge base auto-rebuilds on startup if empty but source files exist —
+  no manual re-upload after a redeploy.
 
 ## Architecture
 
 ```text
-                    ┌──────────────────────┐
-                    │      Streamlit       │
-                    │          UI          │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │      LangGraph        │
-                    │  retrieve_context →  │
-                    │   generate_answer    │
-                    └──────────┬───────────┘
-                               │
-                 ┌─────────────┴──────────────┐
-                 ▼                            ▼
-        ┌────────────────┐          ┌─────────────────┐
-        │ Chroma Vector  │          │ Profile / JSON  │
-        │ Store          │          │ Structured Data │
-        └────────────────┘          └─────────────────┘
+                  ┌──────────────────┐
+                  │    Streamlit     │
+                  │ (portfolio + UI) │
+                  └────────┬─────────┘
+                           │  AI Assistant page
+                           ▼
+                  ┌──────────────────┐
+                  │    LangGraph     │
+                  │  retrieve_context │
+                  │  → generate_answer│
+                  └────────┬─────────┘
+                           │
+                 ┌─────────┴──────────┐
+                 ▼                    ▼
+        ┌────────────────┐   ┌─────────────────┐
+        │ Chroma Vector  │   │ Profile / JSON  │
+        │ Store          │   │ Structured Data │
+        └────────────────┘   └─────────────────┘
                  │
                  ▼
         Knowledge (PDF / Markdown)
 ```
 
-Every chat request runs through the LangGraph graph (`retrieve_context` →
-`generate_answer`), which LangSmith traces end to end once tracing is
-enabled (see below).
+Home and Projects read from `data/profile.json`, `projects.json`,
+`experience.json`, `skills.json` — plain presentation content, kept
+separate from the chatbot's grounding data (`data/knowledge/`). See
+[PROJECT_DECISIONS.md](PROJECT_DECISIONS.md) for the reasoning behind this
+split and every other major choice.
 
 ## Project structure
 
 ```text
-app.py                       Streamlit entrypoint/orchestrator
+streamlit_app.py             Entrypoint: theme, page registration, top nav
 
-src/
-  config/settings.py         All environment-based configuration
+pages/
+  home.py                    Portfolio landing page
+  projects.py                 Projects list
+  assistant.py                  AI chat (LangGraph RAG)
+  admin.py                        Hidden: knowledge management (password-gated)
+
+app/
+  config.py                  All environment-based configuration
   ui/
-    layout.py                Page config, header
-    styles.py                 Three-color CSS
-    components.py              Chat rendering + owner-only knowledge panel
-  ingestion/
-    loader.py                  PDF/Markdown text extraction
-    parser.py                   Text normalization + profile JSON validation
-    chunker.py                   Recursive character chunking
-    pipeline.py                   Orchestrates extract -> chunk -> embed -> store
+    theme.py                 Three-color dark theme (CSS + page config)
+    components.py             Shared blocks: brand header, section titles, skill pills, footer
+    chat.py                     Chat history rendering + empty-state suggestions
   rag/
-    embeddings.py                Local Sentence Transformers / Gemini embeddings
-    vectorstore.py                 Chroma access behind add_documents()/search()
-    retriever.py                    top_k similarity search
-    profile_store.py                 Structured profile JSON read
+    ingestion.py              PDF/Markdown/JSON extract -> chunk -> embed -> store
+    embeddings.py               Local Sentence Transformers / Gemini embeddings
+    vectorstore.py                Chroma access behind add_documents()/search()
+    retrieval.py                    top_k similarity search
+    profile_store.py                  Structured profile JSON read (chatbot grounding)
   graph/
-    state.py                      LangGraph state shape
-    nodes.py                       retrieve_context / generate_answer nodes
-    edges.py                        Graph wiring
+    state.py                  LangGraph state shape
+    nodes.py                    retrieve_context / generate_answer nodes
+    edges.py                      Graph wiring
     graph.py                        build_graph() / run_graph()
-    prompts.py                      System prompt + grounding rules
-  llm/
-    client.py                     LLM provider abstraction (Anthropic / Gemini)
+    prompts.py                        System prompt + grounding rules
+  services/
+    llm.py                     LLM provider abstraction (Anthropic / Gemini)
+    content.py                   Loads presentation content (profile/projects/experience/skills)
 
 data/
-  knowledge/                  Your resume/profile — loaded on startup
+  profile.json                Portfolio bio, tagline, current focus, contact links
+  projects.json                Projects list
+  experience.json               Work history
+  skills.json                     Homepage skill list
+  knowledge/                  Chatbot's RAG source of truth — loaded on startup
     resume.pdf
     profile.md
-    profile.json
+    profile.json               Structured profile merged into every chat prompt
+    profile.example.json        Template for the schema above (not real data)
   vectorstore/                Chroma index (rebuilt from data/knowledge/)
-  profile.example.json        Example profile shape (not real data)
 
+.streamlit/config.toml       Streamlit's native theme (background/text/accent)
 tests/                        Unit tests for ingestion (chunking, validation)
 ```
 
-## Setup
+## Local setup
 
 Requires Python 3.11+.
 
@@ -109,7 +131,7 @@ cp .env.example .env
 | `LANGCHAIN_TRACING_V2` | no | `true` to enable LangSmith tracing |
 | `LANGCHAIN_API_KEY` | no | LangSmith API key |
 | `LANGCHAIN_PROJECT` | no | LangSmith project name |
-| `ADMIN_PASSWORD` | yes | Password gating the in-app knowledge management panel |
+| `ADMIN_PASSWORD` | yes | Password gating the hidden knowledge management page |
 | `CHROMA_PATH` | no | Local Chroma storage path (default `./data/vectorstore`) |
 | `TOP_K` | no | Number of knowledge chunks retrieved per question (default `5`) |
 
@@ -118,39 +140,38 @@ Never commit `.env` — it's already in `.gitignore`.
 ## Running locally
 
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
-## Managing your knowledge
+## Adding/updating profile knowledge
 
-1. Copy `data/profile.example.json`, fill in your real information.
-2. Open the app, expand the sidebar, enter `ADMIN_PASSWORD` to unlock the
-   **Knowledge** panel.
-3. Upload a resume (PDF), a Markdown profile, and/or your profile JSON.
-4. Click **Rebuild Knowledge Base**. This re-extracts, re-chunks, and
-   re-embeds everything in `data/knowledge/`, so re-ingesting never produces
+**Portfolio content** (Home/Projects pages): edit `data/profile.json`,
+`projects.json`, `experience.json`, `skills.json` directly — plain JSON,
+no admin UI needed.
+
+**Chatbot knowledge base**:
+
+1. Open the app and go to the `/admin` URL path directly, or click the
+   small "Owner" link in the footer, then enter `ADMIN_PASSWORD` to unlock.
+   It's a real page, just not listed in the top navigation.
+2. Upload a resume (PDF), a Markdown profile, and/or a profile JSON
+   (see `data/knowledge/profile.example.json` for the required shape).
+3. Click **Rebuild Knowledge Base** — this re-extracts, re-chunks, and
+   re-embeds everything in `data/knowledge/`, so rebuilding never produces
    duplicate chunks.
 
-Until a profile exists, the chat responds with a "not configured yet"
-message instead of crashing or hallucinating.
+Until a profile exists, the AI Assistant responds with a "not configured
+yet" message instead of crashing or hallucinating. Files committed to
+`data/knowledge/` are picked up automatically on startup if the vector
+store is empty — no manual upload needed after a fresh deploy.
 
-Files placed directly in `data/knowledge/` (e.g. by committing them to the
-repo) are picked up automatically on startup if the vector store is empty —
-no manual upload needed after a fresh deploy.
+## LangSmith
 
-## Using the chat
-
-Type a question in the chat box at the bottom and press enter. Follow-up
-questions are answered using the same browser session's conversation
-history (kept in `st.session_state`, capped at the last 20 turns).
-
-## LangSmith setup
-
-1. Create a project at https://smith.langchain.com.
-2. Set `LANGCHAIN_TRACING_V2=true`, `LANGCHAIN_API_KEY`, and
-   `LANGCHAIN_PROJECT` in `.env`.
-3. Every chat turn traces the full LangGraph run — retrieval and
-   generation — under that project. No code changes are required.
+Not enabled by default. To turn it on later, set `LANGCHAIN_TRACING_V2=true`,
+`LANGCHAIN_API_KEY`, and `LANGCHAIN_PROJECT` — no code changes required.
+`run_graph()` already attaches project metadata and a tag to every run, and
+nothing in `app/graph` or `app/rag` depends on Streamlit, so tracing can be
+layered on without touching the UI.
 
 ## Deployment
 

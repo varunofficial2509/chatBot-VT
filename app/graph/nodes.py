@@ -2,10 +2,10 @@
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-from src.graph.prompts import SYSTEM_PROMPT, build_user_message
-from src.graph.state import RecruiterState
-from src.llm.client import get_llm
-from src.rag.retriever import retrieve_relevant_chunks
+from app.graph.prompts import SYSTEM_PROMPT, build_user_message
+from app.graph.state import RecruiterState
+from app.services.llm import get_llm
+from app.rag.retrieval import retrieve_relevant_chunks
 
 
 def retrieve_context(state: RecruiterState) -> dict:

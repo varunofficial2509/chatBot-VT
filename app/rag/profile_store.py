@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from src.config import settings
+from app import config as settings
 
 
 def load_profile() -> dict:

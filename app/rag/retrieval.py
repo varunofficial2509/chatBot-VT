@@ -1,6 +1,6 @@
 """Retrieval of the most relevant knowledge chunks for a recruiter question."""
 
-from src.rag.vectorstore import get_vectorstore
+from app.rag.vectorstore import get_vectorstore
 
 
 def retrieve_relevant_chunks(question: str, top_k: int | None = None) -> list[str]:

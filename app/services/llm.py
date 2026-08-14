@@ -3,7 +3,7 @@
 import streamlit as st
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from src.config import settings
+from app import config as settings
 
 DEFAULT_MODELS = {
     "anthropic": "claude-sonnet-5",

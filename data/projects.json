@@ -1,0 +1,31 @@
+[
+  {
+    "name": "AI Resume Assistant",
+    "category": "Generative AI / RAG",
+    "technologies": ["Python", "Streamlit", "LangGraph", "LangChain", "ChromaDB", "Claude", "Gemini"],
+    "description": "A personal recruiter-facing chatbot that answers questions about my background using retrieval-augmented generation grounded strictly in my resume and profile — the project this site is built on.",
+    "github_url": "https://github.com/varunofficial2509/chatBot-VT"
+  },
+  {
+    "name": "Aviation Maintenance RAG Chatbot",
+    "category": "Generative AI / RAG",
+    "technologies": ["LangChain", "pgvector", "OpenAI API"],
+    "description": "RAG chatbot for answering questions over aviation maintenance documentation.",
+    "github_url": ""
+  },
+  {
+    "name": "ETag HTTP Caching",
+    "category": "Performance Optimization",
+    "technologies": ["Angular", "Spring Boot", "PostgreSQL", "HTTP ETag"],
+    "description": "Implemented HTTP caching using ETags to reduce unnecessary payload transfer and improve API performance.",
+    "result": "Representative API testing showed approximately 21.57% average improvement.",
+    "github_url": ""
+  },
+  {
+    "name": "PDF Generation Modernization",
+    "category": "Backend Modernization",
+    "technologies": ["Java", "Apache PDFBox"],
+    "description": "Migrated PDF generation from iText to Apache PDFBox across approximately 15 PDF generator classes.",
+    "github_url": ""
+  }
+]

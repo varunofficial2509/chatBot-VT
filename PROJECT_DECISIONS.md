@@ -12,7 +12,7 @@ would add network calls, deployment coordination, and operational surface
 area without adding any capability — there's no independent scaling need,
 no separate team, and no reason the ingestion path and the chat path can't
 share a process. A single Streamlit app with clearly separated modules
-(`src/ui`, `src/graph`, `src/rag`, `src/ingestion`, `src/llm`) gets the same
+(`app/ui`, `app/graph`, `app/rag`, `app/services`, plus `pages/` for routes) gets the same
 separation of concerns without the infrastructure tax.
 
 ## Why Streamlit instead of a FastAPI + custom frontend?
@@ -27,6 +27,26 @@ the application layer into one Python process: `st.chat_message` and
 used for the embedding model, LLM client, and compiled graph. The result is
 less code, no HTTP boundary between "the UI" and "the app," and a natural
 fit for a small single-owner tool like this one.
+
+## Why a portfolio site instead of just a chatbot?
+
+A chatbot alone asks a recruiter to trust an unfamiliar interface before
+they've seen any actual signal. A portfolio homepage gives them the fast,
+skimmable version — name, skills, experience, projects — with the AI
+assistant as an optional deeper-dive for specific questions, not the only
+way in. Both experiences read from the same underlying facts, so there's no
+risk of the chatbot and the static page disagreeing.
+
+## Why `st.navigation`/`st.Page` instead of a hand-rolled top nav?
+
+Streamlit ships an official multipage mechanism as of 1.36+ (`st.Page`,
+`st.navigation`, `st.switch_page`) with a native `position="top"` layout —
+exactly the small top nav bar this project needed, without reimplementing
+routing, URL paths, or page state by hand. `pages/admin.py` uses the same
+mechanism's `visibility="hidden"` option to stay reachable (by direct link)
+without appearing in the nav — a supported way to have a route that isn't
+part of the public surface, rather than hacking something together with
+query params or session-state view-switching.
 
 ## Why LangGraph instead of calling an LLM directly?
 
@@ -57,10 +77,25 @@ END
 ```
 
 State passed between nodes: `question`, `chat_history`, `profile`,
-`retrieved_context`, `answer`. None of `src/graph` or `src/rag` imports
+`retrieved_context`, `answer`. None of `app/graph` or `app/rag` imports
 Streamlit — the Streamlit UI calls `run_graph()` and gets back plain data,
 which is what keeps LangSmith tracing a config-only addition rather than a
 UI change (see "Why LangSmith?" below).
+
+## Why is presentation content separate from the RAG knowledge base?
+
+`data/profile.json`, `projects.json`, `experience.json`, and `skills.json`
+drive the Home and Projects pages (`app/services/content.py`).
+`data/knowledge/` — a different `profile.json`, plus any resume PDF or
+Markdown — is what actually gets chunked, embedded, and retrieved by the
+chatbot (`app/rag/profile_store.py`, `app/rag/ingestion.py`). They describe
+the same person but serve different jobs: the portfolio data is small,
+hand-curated, and needs to render fast on every page load; the knowledge
+base is optimized for semantic retrieval and can grow to include a full
+resume PDF without bloating what the Home page has to parse. Keeping them
+as separate files means updating one never risks silently breaking the
+other, and the chatbot's grounding data can keep growing (more documents,
+richer profile fields) independent of what the portfolio chooses to display.
 
 ## Why RAG?
 
@@ -78,7 +113,7 @@ This is a single-owner, low-QPS, single-collection use case — there's no
 need for the operational complexity of a hosted vector database (Pinecone,
 Weaviate, pgvector-on-a-managed-Postgres). Chroma runs embedded, persists to
 local disk, requires no separate service to run or pay for, and its Python
-API is simple enough to read end-to-end in `src/rag/vectorstore.py`, which
+API is simple enough to read end-to-end in `app/rag/vectorstore.py`, which
 wraps it behind a plain `add_documents()` / `search()` interface so the
 storage backend could be swapped later without touching ingestion or
 retrieval callers. The tradeoff (documented below) is that it doesn't scale
@@ -105,7 +140,7 @@ model is ever justified.
 
 The LLM call is the one place where an external, paid API is unavoidable —
 someone has to generate the actual answer text. The provider is fully
-abstracted behind `src/llm/client.py` (`get_llm()`), selected by the
+abstracted behind `app/services/llm.py` (`get_llm()`), selected by the
 `LLM_PROVIDER` env var, so switching providers is a config change, not a
 code change. Two providers are wired up:
 
@@ -115,7 +150,7 @@ code change. Two providers are wired up:
 - **Google Gemini** — a genuinely free-tier-friendly alternative for anyone
   who wants to run this project without a paid API key during development.
 
-Nothing in `src/graph`, `src/ui`, or `src/rag` references a specific
+Nothing in `app/graph`, `app/ui`, or `app/rag` references a specific
 provider — they only call `get_llm()`.
 
 ## Why LangSmith?
@@ -131,22 +166,29 @@ easy to filter. What's traced: the full graph run, broken into the
 chunks and the exact prompt sent to the LLM. Passwords, API keys, and raw
 uploaded files are never included in trace metadata.
 
-## Why is the UI intentionally minimal and restricted to three colors?
+## Why is the UI intentionally minimal, dark, and restricted to three colors?
 
-The chatbot represents a candidate to recruiters — it's a small portfolio
-signal in itself. A restrained UI (background / text / one accent color, no
-gradients, no shadows-as-decoration, no icon soup) reads as deliberate and
-confident rather than under-designed, and it keeps `src/ui` small enough to
-be fully understandable in one sitting — which matters for an interview
-walkthrough.
+The site represents a candidate to recruiters — it's a small portfolio
+signal in itself. A restrained dark UI (`#0F1115` background, `#F5F5F5`
+text, `#3B8C6E` accent — no gradients, no shadows-as-decoration, no icon
+soup) reads as deliberate and confident rather than under-designed, and it
+keeps `app/ui` small enough to be fully understandable in one sitting —
+which matters for an interview walkthrough. The three colors are set once
+in `.streamlit/config.toml` (Streamlit's native theme system), so buttons,
+links, focus rings, and the active nav item all pick up the accent
+automatically instead of needing per-widget overrides — `app/ui/theme.py`
+only adds the CSS Streamlit's theme system can't reach (hiding default
+chrome, chat message styling, opacity-based surfaces for subtle
+separation like the user chat bubble).
 
 ## Why is knowledge management gated by a simple password instead of real auth?
 
 There is exactly one legitimate admin: the candidate who owns the resume.
 There's no multi-user permission model to build, no role hierarchy, no
 audit trail requirement beyond "did the rebuild succeed." Comparing a
-sidebar password field against `ADMIN_PASSWORD` and gating the panel behind
-`st.session_state.admin_unlocked` is proportionate: it prevents a recruiter
+password field on the hidden `/admin` page against `ADMIN_PASSWORD` and
+gating it behind `st.session_state.admin_unlocked` is proportionate: it
+prevents a recruiter
 or random visitor from ever reaching the upload/rebuild controls, without
 introducing OAuth, sessions-in-a-database, or a user table for a system
 that will only ever have one user. Unlike the previous FastAPI version,
@@ -162,14 +204,14 @@ JSON profile) is committed to the repo, and the app checks on startup
 whether the vector store is empty; if so, it rebuilds from whatever's on
 disk. This means the base knowledge always survives a redeploy without
 the owner touching the UI, while the **Rebuild Knowledge Base** button
-still exists for applying changes made through the sidebar or a fresh
+still exists for applying changes made through the admin page or a fresh
 `git push` without waiting for a restart.
 
 ## Why the selected deployment option, and its limitations?
 
 The app is a single Python process with local disk storage (Chroma +
 profile JSON), which fits Streamlit Community Cloud's model directly —
-push to GitHub, point Streamlit Cloud at `app.py`, set secrets. The
+push to GitHub, point Streamlit Cloud at `streamlit_app.py`, set secrets. The
 explicit limitation: Chroma's persistence lives on local disk
 (`data/vectorstore`), which does **not** survive a redeploy. This project
 does not paper over that — the vector store is rebuilt automatically from
@@ -202,13 +244,15 @@ every redeploy on ephemeral-disk hosts).
 
 ## How I Would Explain This Project in an Interview
 
-"I built a personal recruiter chatbot — a small RAG application that lets a
-recruiter ask questions about my background and get answers grounded only
-in my actual resume and a structured JSON profile, never invented content.
+"I built a personal developer portfolio with an integrated AI assistant — a
+small RAG application that lets a recruiter browse my background normally
+or ask questions and get answers grounded only in my actual resume and a
+structured JSON profile, never invented content.
 
-Architecturally, it's a single Streamlit app with two surfaces: a public
-chat interface for recruiters, and a password-gated sidebar panel I use to
-upload my resume and profile. When I upload a document, it goes through a
+Architecturally, it's a single Streamlit app with three public pages (Home,
+Projects, AI Assistant) built on `st.navigation`'s native top nav, plus a
+password-gated admin page — not linked from navigation — I use to upload my
+resume and profile. When I upload a document, it goes through a
 pipeline that extracts the text (PyMuPDF for PDF, plain read for Markdown),
 chunks it, embeds the chunks locally with Sentence Transformers, and stores
 them in a Chroma vector database on disk.
@@ -265,7 +309,7 @@ in the pipeline (every question re-embeds), and no API key needed just to
 get retrieval working locally.
 
 **How does ingestion work?**
-Upload through the sidebar → validate file type and size → extract text
+Upload through the hidden admin page → validate file type and size → extract text
 (PyMuPDF for PDF, plain read for Markdown) → normalize whitespace → chunk
 with a recursive character splitter → embed each chunk locally → replace
 the Chroma collection with the new chunks (so rebuilding never creates
@@ -287,14 +331,15 @@ name is enough for LangGraph to automatically emit traces for every graph
 run, with no code changes. `run_graph()` additionally attaches project
 metadata and a tag so runs are easy to filter in the LangSmith UI.
 
-**How is the knowledge panel protected?**
+**How is the knowledge management page protected?**
 A single shared `ADMIN_PASSWORD` (never hardcoded, only in environment
 variables or Streamlit secrets) gates a `st.session_state` flag for the
-sidebar panel. There's no separate HTTP boundary to protect — the whole app
-is one Streamlit process, so this is proportionate to the actual risk.
+hidden `/admin` page. There's no separate HTTP boundary to protect — the
+whole app is one Streamlit process, so this is proportionate to the actual
+risk.
 
 **What happens when the resume changes?**
-The owner uploads through the sidebar and clicks Rebuild, or commits new
+The owner uploads through the admin page and clicks Rebuild, or commits new
 files to `data/knowledge/` and pushes. Rebuilding always replaces the
 Chroma collection from scratch rather than appending, so there's no risk of
 stale or duplicate chunks from a previous version.

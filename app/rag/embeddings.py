@@ -4,7 +4,7 @@ import chromadb.utils.embedding_functions as embedding_functions
 import streamlit as st
 from chromadb.api.types import Documents, Embeddings
 
-from src.config import settings
+from app import config as settings
 
 
 class _GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):

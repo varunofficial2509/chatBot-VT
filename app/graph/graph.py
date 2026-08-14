@@ -10,10 +10,10 @@ later without changing this graph or the Streamlit UI that calls it.
 import streamlit as st
 from langgraph.graph import StateGraph
 
-from src.config import settings
-from src.graph.edges import wire
-from src.graph.nodes import generate_answer, retrieve_context
-from src.graph.state import RecruiterState
+from app import config as settings
+from app.graph.edges import wire
+from app.graph.nodes import generate_answer, retrieve_context
+from app.graph.state import RecruiterState
 
 
 @st.cache_resource(show_spinner=False)

@@ -12,19 +12,22 @@ pip install -r requirements.txt
 cp .env.example .env
 # edit .env with your real values (see README.md for the variable list)
 
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
 ## GitHub setup
 
 **Commit:**
-- All of `src/`, `app.py`, `requirements.txt`
-- `data/knowledge/` — your real resume/profile files (`resume.pdf`,
+- All of `app/`, `pages/`, `streamlit_app.py`, `.streamlit/config.toml`,
+  `requirements.txt`
+- `data/profile.json`, `projects.json`, `experience.json`, `skills.json` —
+  the portfolio's presentation content
+- `data/knowledge/` — the chatbot's real resume/profile files (`resume.pdf`,
   `profile.md`, `profile.json`). This app's whole purpose is to surface this
   data to recruiters, so it's meant to be public. It also lets the app
   auto-rebuild its knowledge base on a fresh deploy, since Streamlit
   Community Cloud's disk is ephemeral.
-- `data/profile.example.json` (a template, not real data)
+- `data/knowledge/profile.example.json` (a template, not real data)
 
 **Never commit:**
 - `.env` (already git-ignored)
@@ -33,15 +36,14 @@ streamlit run app.py
   source data; committing it just bloats the repo with binary files
 
 If you'd rather keep your resume/profile out of the git history, that's a
-valid choice too — see the "Updating knowledge" section below for the
-tradeoff.
+valid choice too — see "Updating knowledge" below for the tradeoff.
 
 ## Streamlit Community Cloud
 
 1. Push your repository to GitHub.
 2. Go to https://share.streamlit.io and sign in.
 3. Click **New app** and select your repository and branch.
-4. Set the **Main file path** to `app.py`.
+4. Set the **Main file path** to `streamlit_app.py`.
 5. Under **Advanced settings → Secrets**, paste your environment variables
    in TOML format (see below).
 6. Click **Deploy**.
@@ -73,24 +75,31 @@ with the same content (it's git-ignored), or just keep using `.env` — both
 work, since the app checks the environment first and falls back to
 `st.secrets`.
 
+Note: `.streamlit/config.toml` (the app's dark theme) **is** committed and
+public — only `.streamlit/secrets.toml` is git-ignored.
+
 **Never commit real API keys or `ADMIN_PASSWORD`** — only ever set them as
 Streamlit secrets or in your local, git-ignored `.env`.
 
 ## Updating knowledge
 
-- **Locally:** run the app, unlock the sidebar **Knowledge** panel with
-  `ADMIN_PASSWORD`, upload PDF/Markdown/JSON files, then click **Rebuild
+**Portfolio content** (Home/Projects pages) — edit `data/profile.json`,
+`projects.json`, `experience.json`, `skills.json` directly and push. No
+admin UI involved; these are read on every page load.
+
+**Chatbot knowledge base**:
+- **Locally:** run the app, go to the hidden `/admin` page (password-gated,
+  not in the top nav), upload PDF/Markdown/JSON files, then click **Rebuild
   Knowledge Base**. Commit the updated files in `data/knowledge/` and push.
-- **On Streamlit Cloud:** the same sidebar panel works against the live
-  app's disk, but that disk resets on every redeploy — so for changes to
-  survive redeploys, update the files under `data/knowledge/` in your repo
-  and push. On the next deploy (or app restart), the app detects an empty
-  vector store and automatically rebuilds it from whatever's in
-  `data/knowledge/`.
-- `profile.json` is the structured data merged directly into every prompt;
-  `resume.pdf` / `profile.md` are chunked and embedded for retrieval.
-  Rebuilding always replaces the entire vector store, so there's no risk of
-  duplicate or stale chunks from a previous version.
+- **On Streamlit Cloud:** the same admin page works against the live app's
+  disk, but that disk resets on every redeploy — so for changes to survive
+  redeploys, update the files under `data/knowledge/` in your repo and
+  push. On the next deploy (or app restart), the app detects an empty
+  vector store and automatically rebuilds it from `data/knowledge/`.
+- `profile.json` inside `data/knowledge/` is the structured data merged
+  directly into every chat prompt; `resume.pdf` / `profile.md` are chunked
+  and embedded for retrieval. Rebuilding always replaces the entire vector
+  store, so there's no risk of duplicate or stale chunks.
 
 ## Troubleshooting
 
@@ -104,17 +113,21 @@ Check the app's build logs in the Streamlit Cloud dashboard. `chromadb` and
 fails to build, try relaxing that pin in `requirements.txt`.
 
 **Vector store initialization issues / empty responses**
-The chat replies "not configured yet" until a valid `profile.json` exists in
-`data/knowledge/`. If you've uploaded files but see no results, click
-**Rebuild Knowledge Base** in the sidebar — the vector store only rebuilds
-automatically when it's empty, not on every file change.
+The AI Assistant replies "not configured yet" until a valid `profile.json`
+exists in `data/knowledge/`. If you've uploaded files but see no results,
+go to `/admin` and click **Rebuild Knowledge Base** — the vector store only
+rebuilds automatically when it's empty, not on every file change.
 
 **Streamlit startup errors**
-Run `streamlit run app.py` locally first — errors surface faster locally
-than in Cloud build logs. Most startup failures are a missing/misnamed
-environment variable or a `requirements.txt` version conflict.
+Run `streamlit run streamlit_app.py` locally first — errors surface faster
+locally than in Cloud build logs. Most startup failures are a missing or
+misnamed environment variable, or a `requirements.txt` version conflict.
 
 **Knowledge disappears after a redeploy**
 Expected if `data/knowledge/` isn't committed to your repo — Streamlit
 Cloud's disk is ephemeral. Commit your knowledge files (see "GitHub setup"
 above) so the app can rebuild automatically on startup.
+
+**Default Streamlit colors showing through (blue links, red errors, etc.)**
+Make sure `.streamlit/config.toml` is committed and deployed — it's what
+overrides Streamlit's default theme with the app's three colors.

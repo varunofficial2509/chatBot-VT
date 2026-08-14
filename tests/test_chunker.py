@@ -1,4 +1,4 @@
-from src.ingestion.chunker import chunk_text
+from app.rag.ingestion import chunk_text
 
 
 def test_chunk_text_splits_long_text():
