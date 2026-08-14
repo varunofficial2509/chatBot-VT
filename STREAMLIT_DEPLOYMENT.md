@@ -112,21 +112,25 @@ pinned version fails to build, try relaxing that pin in `requirements.txt`.
 
 **"Failed building wheel for tokenizers" / PyO3 "Python interpreter version
 is newer than PyO3's maximum supported version"**
-Streamlit Cloud picked a Python version newer than what the `tokenizers`
-Rust build (a `chromadb` dependency) currently supports — there's no
-prebuilt wheel for it yet, so the build tries to compile from source and
-fails. This repo pins Python 3.11 two ways: `runtime.txt` (`3.11`, the
-older Heroku-style convention) and `.python-version` (`3.11`, read by
-`uv`, which is what Streamlit Cloud's build logs show it now uses instead
-of plain pip). Make sure both are committed and pushed, then **Reboot
-app** (or delete and redeploy) so Cloud rebuilds with the pinned version.
+`chromadb==0.5.23` pinned `tokenizers<=0.20.3`, a version that predates
+`tokenizers`'s move to `abi3` wheels (one wheel works across all Python
+versions — no per-version prebuilt binary, no compilation). On a Python
+version newer than what 0.20.3 shipped binaries for, pip has to compile it
+from source via Rust/PyO3, which fails outright on very new Python
+versions PyO3 doesn't support yet. **Fixed by upgrading to
+`chromadb==1.5.9`** (current `requirements.txt`), which has no upper bound
+on `tokenizers` and so resolves to a recent `abi3` release — no
+compilation, no Rust toolchain, no Python-version sensitivity at all. This
+is the actual fix; `runtime.txt` and `.python-version` (both `3.11`) are
+still in the repo as defense-in-depth but shouldn't be load-bearing anymore.
+If you ever see this error again after bumping a pinned dependency, check
+whether that package caps a native-wheel dependency below its first
+`abi3` release before reaching for a Python-version pin.
 
-**If the build logs still say `Using Python 3.14.7` (or any version other
-than 3.11) after that** — these files are being ignored. Set the version
-explicitly instead: open the app in the Streamlit Cloud dashboard →
-**Settings (⚙️) → General → Python version** → select `3.11` → **Save**,
-then reboot. This dashboard setting takes precedence over any file in the
-repo and is the most reliable option if the files alone don't work.
+**If a dependency install still fails for a Python-version reason** after
+that, the reliable override is the Streamlit Cloud dashboard: open the app
+→ **Settings (⚙️) → General → Python version** → pick a version → **Save**
+→ reboot. That takes precedence over any file in the repo.
 
 **Vector store initialization issues / empty responses**
 The AI Assistant replies "not configured yet" until a valid `profile.json`
