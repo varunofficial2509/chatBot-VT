@@ -120,21 +120,24 @@ retrieval callers. The tradeoff (documented below) is that it doesn't scale
 past one process and its storage isn't guaranteed to persist on every free
 hosting tier.
 
-## Why Sentence Transformers (local embeddings)?
+## Why Gemini embeddings instead of local Sentence Transformers?
 
-Embeddings are generated once per document upload and once per question —
-low volume, latency-tolerant. Running them locally via
-`sentence-transformers` (`all-MiniLM-L6-v2` by default) means:
+This project used to support local embeddings via `sentence-transformers`
+as a no-API-key fallback. In practice it was never used — `.env` was
+always configured for Gemini embeddings — and it had a real cost:
+`sentence-transformers` depends on `torch`, whose default Linux wheel pulls
+in NVIDIA CUDA libraries (`nvidia-cublas-cu12`, `nvidia-cudnn-cu12`, etc.)
+as dependencies even though nothing here has a GPU. That's several
+gigabytes of unnecessary download and a much slower, more fragile
+Streamlit Cloud build, for an option nobody was exercising. Since the app
+already requires `GOOGLE_API_KEY` for the LLM (see above), requiring it for
+embeddings too costs nothing extra and removes `sentence-transformers` (and
+`torch`) from the dependency tree entirely. Embeddings are still generated
+once per document upload and once per question — low volume, latency- and
+cost-tolerant — so the per-call API cost is negligible.
 
-- No per-embedding API cost or external dependency for the most
-  frequently-called part of the pipeline.
-- No API key required just to get retrieval working.
-- The model is small enough (~80MB) to run comfortably in a small container,
-  and `st.cache_resource` ensures it's loaded once per process, not once per
-  Streamlit rerun.
-
-The embedding model is configurable (`EMBEDDING_MODEL` env var) if a larger
-model is ever justified.
+The embedding model is configurable (`EMBEDDING_MODEL` env var) if a
+different Gemini embedding model is ever preferred.
 
 ## Why Gemini as the only LLM provider?
 
@@ -254,8 +257,8 @@ Projects, AI Assistant) built on `st.navigation`'s native top nav, plus a
 password-gated admin page — not linked from navigation — I use to upload my
 resume and profile. When I upload a document, it goes through a
 pipeline that extracts the text (PyMuPDF for PDF, plain read for Markdown),
-chunks it, embeds the chunks locally with Sentence Transformers, and stores
-them in a Chroma vector database on disk.
+chunks it, embeds the chunks with Gemini, and stores them in a Chroma
+vector database on disk.
 
 When a recruiter asks a question, it runs through a LangGraph graph with two
 nodes: retrieve the most relevant knowledge chunks for that question, then
@@ -302,10 +305,12 @@ Single-owner, low-QPS, single-collection workload — an embedded, local,
 free vector store is the right size for the problem. It doesn't need a
 managed service's operational overhead or cost.
 
-**Why local embeddings instead of an embeddings API?**
-No per-call cost or external dependency for the highest-frequency operation
-in the pipeline (every question re-embeds), and no API key needed just to
-get retrieval working locally.
+**Why Gemini embeddings instead of running them locally?**
+Local embeddings via `sentence-transformers` were tried and dropped —
+its `torch` dependency pulls in gigabytes of NVIDIA CUDA libraries on
+Linux even without a GPU, which made Streamlit Cloud builds slow and
+fragile for a fallback path nobody used. The app already requires a Google
+API key for the LLM, so using it for embeddings too was free simplicity.
 
 **How does ingestion work?**
 Upload through the hidden admin page → validate file type and size → extract text

@@ -77,7 +77,7 @@ app/
     chat.py                     Chat history rendering + empty-state suggestions
   rag/
     ingestion.py              PDF/Markdown/JSON extract -> chunk -> embed -> store
-    embeddings.py               Local Sentence Transformers / Gemini embeddings
+    embeddings.py               Gemini embeddings
     vectorstore.py                Chroma access behind add_documents()/search()
     retrieval.py                    top_k similarity search
     profile_store.py                  Structured profile JSON read (chatbot grounding)

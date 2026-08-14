@@ -106,16 +106,16 @@ Set `GOOGLE_API_KEY` in Streamlit Cloud's Secrets panel (or your local
 `.env`) — it's required, the app only supports Gemini.
 
 **Dependency installation failure on deploy**
-Check the app's build logs in the Streamlit Cloud dashboard. `chromadb` and
-`sentence-transformers` pull in native wheels — if a specific pinned version
-fails to build, try relaxing that pin in `requirements.txt`.
+Check the app's build logs in the Streamlit Cloud dashboard. `chromadb`
+pulls in native wheels (`onnxruntime`, `tokenizers`) — if a specific
+pinned version fails to build, try relaxing that pin in `requirements.txt`.
 
 **"Failed building wheel for tokenizers" / PyO3 "Python interpreter version
 is newer than PyO3's maximum supported version"**
 Streamlit Cloud picked a Python version newer than what the `tokenizers`
-Rust build (a `sentence-transformers` dependency) currently supports —
-there's no prebuilt wheel for it yet, so pip tries to compile from source
-and fails. This repo's `runtime.txt` (contents: `3.11`, Streamlit Cloud's expected
+Rust build (a `chromadb` dependency) currently supports — there's no
+prebuilt wheel for it yet, so pip tries to compile from source and fails.
+This repo's `runtime.txt` (contents: `3.11`, Streamlit Cloud's expected
 bare-version format) pins the build to Python 3.11 to avoid this; make sure
 it's committed and pushed, then click **Reboot app** (or delete and
 redeploy) so Cloud rebuilds with the pinned version. If it still picks the

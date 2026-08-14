@@ -41,11 +41,7 @@ ADMIN_PASSWORD = _get("ADMIN_PASSWORD", "")
 # RAG / vector store
 CHROMA_PATH = _get("CHROMA_PATH", str(BASE_DIR / "data" / "vectorstore"))
 CHROMA_COLLECTION = _get("CHROMA_COLLECTION", "resume")
-EMBEDDING_PROVIDER = _get("EMBEDDING_PROVIDER", "local")
-EMBEDDING_MODEL = _get(
-    "EMBEDDING_MODEL",
-    "gemini-embedding-001" if EMBEDDING_PROVIDER == "gemini" else "all-MiniLM-L6-v2",
-)
+EMBEDDING_MODEL = _get("EMBEDDING_MODEL", "gemini-embedding-001")
 TOP_K = int(_get("TOP_K", "5"))
 CHUNK_SIZE = int(_get("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(_get("CHUNK_OVERLAP", "100"))
