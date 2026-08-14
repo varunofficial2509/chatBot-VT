@@ -88,7 +88,7 @@ app/
     graph.py                        build_graph() / run_graph()
     prompts.py                        System prompt + grounding rules
   services/
-    llm.py                     LLM provider abstraction (Anthropic / Gemini)
+    llm.py                     Gemini chat model client
     content.py                   Loads presentation content (profile/projects/experience/skills)
 
 data/
@@ -124,10 +124,8 @@ cp .env.example .env
 
 | Variable | Required | Description |
 |---|---|---|
-| `LLM_PROVIDER` | yes | `anthropic` or `gemini` |
-| `LLM_MODEL` | no | Overrides the provider's default model |
-| `ANTHROPIC_API_KEY` | if using Anthropic | Anthropic API key |
-| `GOOGLE_API_KEY` | if using Gemini | Google AI Studio API key (has a free tier) |
+| `LLM_MODEL` | no | Overrides the default Gemini model (`gemini-3.5-flash-lite`) |
+| `GOOGLE_API_KEY` | yes | Google AI Studio API key (has a free tier) |
 | `LANGCHAIN_TRACING_V2` | no | `true` to enable LangSmith tracing |
 | `LANGCHAIN_API_KEY` | no | LangSmith API key |
 | `LANGCHAIN_PROJECT` | no | LangSmith project name |

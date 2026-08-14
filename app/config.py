@@ -26,10 +26,8 @@ def _get(key: str, default: str = "") -> str:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# LLM provider
-LLM_PROVIDER = _get("LLM_PROVIDER", "anthropic")
+# LLM (Gemini)
 LLM_MODEL = _get("LLM_MODEL", "")
-ANTHROPIC_API_KEY = _get("ANTHROPIC_API_KEY", "")
 GOOGLE_API_KEY = _get("GOOGLE_API_KEY", "")
 
 # LangSmith / LangChain tracing (picked up automatically by langchain if set)

@@ -55,10 +55,8 @@ Streamlit Community Cloud doesn't read `.env` files — it uses a
 same variable names as `.env` (nothing is renamed), so paste something like:
 
 ```toml
-LLM_PROVIDER = "anthropic"
-LLM_MODEL = "claude-sonnet-5"
-ANTHROPIC_API_KEY = "sk-ant-..."
-GOOGLE_API_KEY = ""
+LLM_MODEL = "gemini-3.5-flash-lite"
+GOOGLE_API_KEY = "AIza..."
 
 LANGCHAIN_TRACING_V2 = "false"
 LANGCHAIN_API_KEY = ""
@@ -103,9 +101,9 @@ admin UI involved; these are read on every page load.
 
 ## Troubleshooting
 
-**"ANTHROPIC_API_KEY is not set" / "GOOGLE_API_KEY is not set"**
-The secret isn't set for the provider selected by `LLM_PROVIDER`. Check
-Streamlit Cloud's Secrets panel (or your local `.env`) matches the provider.
+**"GOOGLE_API_KEY is not set"**
+Set `GOOGLE_API_KEY` in Streamlit Cloud's Secrets panel (or your local
+`.env`) — it's required, the app only supports Gemini.
 
 **Dependency installation failure on deploy**
 Check the app's build logs in the Streamlit Cloud dashboard. `chromadb` and

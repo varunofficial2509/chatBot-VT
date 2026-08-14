@@ -136,22 +136,22 @@ low volume, latency-tolerant. Running them locally via
 The embedding model is configurable (`EMBEDDING_MODEL` env var) if a larger
 model is ever justified.
 
-## Why the selected LLM provider?
+## Why Gemini as the only LLM provider?
 
 The LLM call is the one place where an external, paid API is unavoidable —
-someone has to generate the actual answer text. The provider is fully
-abstracted behind `app/services/llm.py` (`get_llm()`), selected by the
-`LLM_PROVIDER` env var, so switching providers is a config change, not a
-code change. Two providers are wired up:
-
-- **Anthropic (Claude)** — the default. Strong instruction-following is
-  exactly what's needed for a chatbot with hard grounding rules ("never
-  invent X") — it needs to actually respect them.
-- **Google Gemini** — a genuinely free-tier-friendly alternative for anyone
-  who wants to run this project without a paid API key during development.
-
-Nothing in `app/graph`, `app/ui`, or `app/rag` references a specific
-provider — they only call `get_llm()`.
+someone has to generate the actual answer text. This project used to
+support both Anthropic and Gemini behind a `LLM_PROVIDER` switch, but that
+abstraction was paying for optionality nobody was using: Gemini (which has
+a genuinely free-tier-friendly API key, unlike Anthropic) was the only
+provider actually configured in `.env`. Keeping the branch, the
+`langchain-anthropic` dependency, and the unused `ANTHROPIC_API_KEY` /
+`LLM_PROVIDER` env vars around was dead weight, not flexibility — so
+`app/services/llm.py` (`get_llm()`) now builds a `ChatGoogleGenerativeAI`
+directly. The model name is still overridable via `LLM_MODEL`, so swapping
+to a different Gemini model is a config change, not a code change. If a
+second provider becomes genuinely necessary later, reintroducing the
+branch is a small, contained change — `get_llm()` is still the only thing
+`app/graph` calls.
 
 ## Why LangSmith?
 
@@ -259,8 +259,7 @@ them in a Chroma vector database on disk.
 
 When a recruiter asks a question, it runs through a LangGraph graph with two
 nodes: retrieve the most relevant knowledge chunks for that question, then
-generate an answer using an LLM — Claude by default, but the provider is
-abstracted so it's a config change to swap to Gemini. The system prompt is
+generate an answer using Gemini. The system prompt is
 explicit that the model must never invent experience and must say when it
 doesn't have enough information. Every request is traceable end-to-end in
 LangSmith once tracing is enabled, so I can see exactly what was retrieved
