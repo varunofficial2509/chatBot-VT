@@ -19,7 +19,7 @@ streamlit run streamlit_app.py
 
 **Commit:**
 - All of `app/`, `pages/`, `streamlit_app.py`, `.streamlit/config.toml`,
-  `requirements.txt`, `runtime.txt`
+  `requirements.txt`, `runtime.txt`, `.python-version`
 - `data/profile.json`, `projects.json`, `experience.json`, `skills.json` —
   the portfolio's presentation content
 - `data/knowledge/` — the chatbot's real resume/profile files (`resume.pdf`,
@@ -114,14 +114,19 @@ pinned version fails to build, try relaxing that pin in `requirements.txt`.
 is newer than PyO3's maximum supported version"**
 Streamlit Cloud picked a Python version newer than what the `tokenizers`
 Rust build (a `chromadb` dependency) currently supports — there's no
-prebuilt wheel for it yet, so pip tries to compile from source and fails.
-This repo's `runtime.txt` (contents: `3.11`, Streamlit Cloud's expected
-bare-version format) pins the build to Python 3.11 to avoid this; make sure
-it's committed and pushed, then click **Reboot app** (or delete and
-redeploy) so Cloud rebuilds with the pinned version. If it still picks the
-wrong version, set it explicitly in the app's **Settings → Python version**
-dropdown in the Streamlit Cloud dashboard — that takes precedence and is
-the most reliable option.
+prebuilt wheel for it yet, so the build tries to compile from source and
+fails. This repo pins Python 3.11 two ways: `runtime.txt` (`3.11`, the
+older Heroku-style convention) and `.python-version` (`3.11`, read by
+`uv`, which is what Streamlit Cloud's build logs show it now uses instead
+of plain pip). Make sure both are committed and pushed, then **Reboot
+app** (or delete and redeploy) so Cloud rebuilds with the pinned version.
+
+**If the build logs still say `Using Python 3.14.7` (or any version other
+than 3.11) after that** — these files are being ignored. Set the version
+explicitly instead: open the app in the Streamlit Cloud dashboard →
+**Settings (⚙️) → General → Python version** → select `3.11` → **Save**,
+then reboot. This dashboard setting takes precedence over any file in the
+repo and is the most reliable option if the files alone don't work.
 
 **Vector store initialization issues / empty responses**
 The AI Assistant replies "not configured yet" until a valid `profile.json`
