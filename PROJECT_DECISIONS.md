@@ -169,6 +169,14 @@ easy to filter. What's traced: the full graph run, broken into the
 chunks and the exact prompt sent to the LLM. Passwords, API keys, and raw
 uploaded files are never included in trace metadata.
 
+Verified end-to-end with a real trace: `LangGraph` (root) → `retrieve_context`
++ `generate_answer` → `ChatGoogleGenerativeAI` nested under `generate_answer`
+— exactly the hierarchy the two-node design was meant to produce. Queried
+via the `langsmith` CLI (installed alongside the
+[langsmith-skills](https://github.com/langchain-ai/langsmith-skills)
+plugin under `.claude/skills/`), which is also the tool to reach for later
+if this project adds an eval dataset or custom evaluators.
+
 ## Why is the UI intentionally minimal, dark, and restricted to three colors?
 
 The site represents a candidate to recruiters — it's a small portfolio

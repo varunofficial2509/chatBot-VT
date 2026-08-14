@@ -165,11 +165,26 @@ store is empty — no manual upload needed after a fresh deploy.
 
 ## LangSmith
 
-Not enabled by default. To turn it on later, set `LANGCHAIN_TRACING_V2=true`,
-`LANGCHAIN_API_KEY`, and `LANGCHAIN_PROJECT` — no code changes required.
-`run_graph()` already attaches project metadata and a tag to every run, and
-nothing in `app/graph` or `app/rag` depends on Streamlit, so tracing can be
-layered on without touching the UI.
+Tracing is wired up and verified. Set `LANGCHAIN_TRACING_V2=true`,
+`LANGCHAIN_API_KEY`, and `LANGCHAIN_PROJECT` in `.env` — no code changes
+needed. Since the app is built on LangGraph, tracing is automatic: every
+chat turn produces a trace with `retrieve_context` and `generate_answer`
+as separate child spans (the LLM call nests under `generate_answer`).
+`run_graph()` also attaches project metadata and a `recruiter-chat` tag to
+every run. Nothing in `app/graph` or `app/rag` depends on Streamlit, so
+this works independently of the UI layer.
+
+Query traces from the terminal with the `langsmith` CLI:
+
+```bash
+langsmith trace list --project personal-recruiter-chatbot --last-n-minutes 60 --api-key $LANGCHAIN_API_KEY
+langsmith trace get <trace-id> --project personal-recruiter-chatbot --api-key $LANGCHAIN_API_KEY
+```
+
+This repo also has the [langsmith-skills](https://github.com/langchain-ai/langsmith-skills)
+installed under `.claude/skills/` (`langsmith-trace`, `langsmith-dataset`,
+`langsmith-evaluator`) for Claude Code sessions working on tracing,
+building eval datasets from traces, or writing custom evaluators.
 
 ## Deployment
 
