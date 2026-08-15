@@ -11,3 +11,7 @@ data/vectorstore/*
 .DS_Store
 PROJECT_DECISIONS.md
 STREAMLIT_DEPLOYMENT.md
+.claude/skills/
+.devcontainer/
+tests/
+requirements-dev.txt
