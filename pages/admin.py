@@ -13,27 +13,27 @@ from app.rag.ingestion import (
 )
 from app.services import content
 from app.ui import components
+from app.ui.theme import inject_css
 
 logger = logging.getLogger("recruiter_bot.admin")
 
+inject_css()
+
 profile_meta = content.load_profile()
-components.render_brand_header(profile_meta.get("name", ""), "Manage Knowledge")
+components.render_nav_header(active="admin", name=profile_meta.get("name", ""))
 
 
 def _status(message: str, ok: bool) -> None:
     color = "var(--accent)" if ok else "var(--text)"
-    st.markdown(f'<p style="color: {color}; font-size: 0.9rem;">{message}</p>', unsafe_allow_html=True)
+    st.html(f'<p style="color: {color}; font-size: 0.9rem;">{message}</p>')
 
 
 if not settings.ADMIN_PASSWORD:
-    st.markdown(
-        '<p class="text-muted">Set ADMIN_PASSWORD in your environment to manage knowledge.</p>',
-        unsafe_allow_html=True,
-    )
+    st.html('<p class="text-muted">Set ADMIN_PASSWORD in your environment to manage knowledge.</p>')
     st.stop()
 
 if not st.session_state.get("admin_unlocked"):
-    st.markdown('<p class="text-muted">Owner access only.</p>', unsafe_allow_html=True)
+    st.html('<p class="text-muted">Owner access only.</p>')
     password = st.text_input("Password", type="password", key="admin_password_input")
     if st.button("Unlock", type="primary"):
         if password and password == settings.ADMIN_PASSWORD:
@@ -43,10 +43,9 @@ if not st.session_state.get("admin_unlocked"):
             _status("Incorrect password.", ok=False)
     st.stop()
 
-st.markdown(
+st.html(
     '<div style="font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;" class="text-muted">'
-    "Knowledge Base</div>",
-    unsafe_allow_html=True,
+    "Knowledge Base</div>"
 )
 
 uploaded = st.file_uploader("Upload document", type=["pdf", "md", "json"], key="knowledge_uploader")
@@ -64,9 +63,9 @@ st.markdown("**Current knowledge**")
 files = list_knowledge_files()
 if files:
     items = "".join(f"<li>{name}</li>" for name in files)
-    st.markdown(f'<ul class="text-muted" style="font-size: 0.9rem;">{items}</ul>', unsafe_allow_html=True)
+    st.html(f'<ul class="text-muted" style="font-size: 0.9rem;">{items}</ul>')
 else:
-    st.markdown('<span class="text-muted">No knowledge files yet.</span>', unsafe_allow_html=True)
+    st.html('<span class="text-muted">No knowledge files yet.</span>')
 
 if st.button("Rebuild Knowledge Base", type="primary"):
     with st.spinner("Rebuilding..."):
@@ -83,5 +82,5 @@ if st.button("Rebuild Knowledge Base", type="primary"):
             logger.exception("Failed to rebuild knowledge base")
             _status("Failed to process document.", ok=False)
 
-st.markdown('<hr style="margin: 1.5rem 0 0.75rem; opacity: 0.4;" />', unsafe_allow_html=True)
+st.html('<hr style="margin: 1.5rem 0 0.75rem; opacity: 0.4;" />')
 st.page_link("pages/home.py", label="← Back to site")

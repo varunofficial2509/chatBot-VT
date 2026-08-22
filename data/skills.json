@@ -1,14 +1,8 @@
-[
-  "Java",
-  "Spring Boot",
-  "Microservices",
-  "Kafka",
-  "Angular",
-  "PostgreSQL",
-  "Redis",
-  "GenAI",
-  "RAG",
-  "LangChain",
-  "LangGraph",
-  "pgvector"
-]
+{
+  "Languages": ["Java", "TypeScript", "Python", "SQL"],
+  "Backend": ["Spring Boot", "Microservices", "REST", "JPA/Hibernate"],
+  "Frontend": ["Angular", "RxJS"],
+  "Data & Messaging": ["PostgreSQL", "Redis", "Kafka"],
+  "GenAI": ["RAG", "LangChain", "LangGraph", "pgvector", "LLM Applications"],
+  "Tools": ["Docker", "Kubernetes", "Git", "JUnit", "SonarQube"]
+}

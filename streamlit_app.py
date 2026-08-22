@@ -16,5 +16,5 @@ pages = [
     st.Page("pages/admin.py", title="Manage Knowledge", url_path="admin", visibility="hidden"),
 ]
 
-nav = st.navigation(pages, position="top")
+nav = st.navigation(pages, position="hidden")
 nav.run()

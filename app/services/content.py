@@ -7,6 +7,7 @@ skills.json). Same underlying facts, different shape for a different job.
 """
 
 import json
+import re
 from pathlib import Path
 
 from app import config as settings
@@ -36,8 +37,25 @@ def load_experience() -> list[dict]:
     return _load_json("experience.json", [])
 
 
-def load_skills() -> list[str]:
-    return _load_json("skills.json", [])
+def load_skills() -> dict[str, list[str]]:
+    return _load_json("skills.json", {})
+
+
+def mentioned_technologies(description: str, skills: dict[str, list[str]]) -> list[str]:
+    """Skills from the master list that are literally named in this text,
+    in the order they appear. Never adds anything the description doesn't
+    already say — used to surface a "technologies" line on experience
+    cards without duplicating that list by hand in experience.json.
+    """
+    flat = [skill for group in skills.values() for skill in group]
+    matches = []
+    for skill in flat:
+        pattern = r"\b" + re.escape(skill) + r"\b"
+        found = re.search(pattern, description, re.IGNORECASE)
+        if found:
+            matches.append((found.start(), skill))
+    matches.sort(key=lambda pair: pair[0])
+    return [skill for _, skill in matches]
 
 
 def resume_path() -> Path | None:
